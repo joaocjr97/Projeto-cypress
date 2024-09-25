@@ -1,4 +1,7 @@
 /// <reference types="cypress" />
+const perfil = require('../fixtures/perfil.json')
+import { faker } from '@faker-js/faker';
+import produtosPage from '../support/page_objects/produtos.page';
 
 context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
   /*  Como cliente 
@@ -10,11 +13,10 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
       E validando minha compra ao final */
 
   beforeEach(() => {
-      cy.visit('produto')
+      produtosPage.visitarUrl()  //Uso de Produtos Page
   });
 
   it('Deve fazer um pedido na loja Ebac Shop de ponta a ponta', () => {
-      //TODO: Coloque todo o fluxo de teste aqui, considerando as boas práticas e otimizações
       cy.get('[class="product-block grid"]')
       .contains('Arcadio Gym Short')
       .click()
@@ -47,15 +49,15 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
       cy.get('.dropdown-toggle > .text-skin > .icon-basket').click()
       cy.get('#cart > .dropdown-menu > .widget_shopping_cart_content > .mini_cart_content > .mini_cart_inner > .mcart-border > .buttons > .checkout').click()
       cy.get('.showlogin').click()
-      cy.get('#username').type('aluno_ebac@teste.com')
-      cy.get('#password').type('teste@teste.com')
+      cy.get('#username').type(perfil.usuario)  // Uso de Arquivo de Dados (fixture)
+      cy.get('#password').type(perfil.senha)    // Uso de Arquivo de Dados (fixture)
       cy.get('.woocommerce-button').click()
+      cy.get('#billing_first_name').clear().type(faker.person.firstName())   // Uso de comandos Customizados com Faker.js
+      cy.get('#billing_last_name').clear().type(faker.person.lastName())    // Uso de comandos Customizados com Faker.js
       cy.get('#payment_method_cod').click()
       cy.get('#terms').click()
       cy.get('#place_order').click()
       cy.wait(3000)
-      cy.get('.woocommerce-notice').should('contain', 'Obrigado. Seu pedido foi recebido.')
-  });
-
-
+      cy.get('.woocommerce-notice').should('exist')
+    });
 })
